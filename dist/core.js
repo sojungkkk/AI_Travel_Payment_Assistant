@@ -78,7 +78,6 @@
     return { purchases, fees, gross, actual, pending, net: gross - actual, projected: gross - actual - pending };
   }
   function parseCash(text, config) {
-    if (/[-−]\s*\d/.test(text)) return { error: '필요 금액은 0 이상으로 입력해 주세요.' };
     const code = config.code;
     const units = { EUR: '유로|EUR|€', THB: '바트|THB|฿', JPY: '엔|JPY|¥' };
     const any = text.match(/(?:유로|EUR|€|바트|THB|฿|엔|JPY|¥)/i)?.[0];

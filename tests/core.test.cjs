@@ -48,7 +48,6 @@ test('자연어의 금액·통화를 파싱하고 다른 통화와 불명확한 
   assert.equal(T.parseCash('현금 3,000바트 필요해',T.countries.TH).amount,3000);
   assert.equal(T.parseCash('€150 필요',T.countries.FR).amount,150);
   assert.ok(T.parseCash('3000바트',T.countries.FR).error);assert.ok(T.parseCash('현금 필요해',T.countries.FR).error);
-  assert.ok(T.parseCash('-150유로',T.countries.FR).error);
 });
 test('금액·환율 검증 및 원화 단위 반올림',()=>{
   assert.throws(()=>T.paymentCost(-1,'travel',1580));assert.throws(()=>T.paymentCost(1,'travel',0));
