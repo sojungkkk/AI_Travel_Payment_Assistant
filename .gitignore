@@ -1,1 +1,9 @@
 .env
+
+# 로컬 도구 및 연습 파일
+/.agents/skills/
+/fee-kata/
+/skills-lock.json
+
+# macOS 메타데이터
+.DS_Store
