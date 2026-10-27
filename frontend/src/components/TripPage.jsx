@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { countries, methodNames } from '../utils/core.js';
+import { countries } from '../utils/core.js';
 import { formValues, won } from '../utils/format.js';
 import { isKoreanCity, normalizeCity } from '../utils/city.js';
 import { CHECKED_AT, cardCategories, cardsFor, issuersFor, findPreset, cardBenefits, primaryCategory } from '../utils/cards.js';
@@ -20,13 +20,6 @@ export default function TripPage({ trip, hidden, updateTrip, navigate }) {
   const pickIssuer = category === 'standard' ? issuer : undefined;
   const country = countries[trip.country];
   const heroCity = normalizeCity(trip.city, trip.country);
-  const guides = [
-    ['€', country.currency + '로 결제해요', '현지통화 ' + country.code + '와 해외원화결제 조건을 비교하세요.'],
-    ['▣', trip.card === 'none' ? '카드가 없다면 현금 준비부터' : '보유 카드의 해외 사용을 확인해요',
-      trip.card === 'none' ? '환전용 원화 현금과 현지 결제 수단을 확인하세요.' : methodNames[trip.card] + ' · 해외결제 설정, 수수료와 인출 한도 확인'],
-    ['↗', trip.account ? '외화계좌의 충전 조건을 확인해요' : '외화 충전 서비스도 비교할 수 있어요',
-      trip.account ? '지원 통화·충전 시간·인출 가능 여부를 확인하세요.' : '서비스 개설·사용 가능 여부가 확인된 대안만 비교하세요.'],
-  ];
 
   function changeCategory(value) {
     setCategory(value);
@@ -83,7 +76,7 @@ export default function TripPage({ trip, hidden, updateTrip, navigate }) {
     setCity(koreanCity);
     updateTrip({ country: data.country, city: koreanCity, depart: data.depart, return: data.return,
       budget: Number(data['trip-budget']), cash: Number(data['trip-cash']), card: primaryCategory(nextCards), cards: nextCards, account: data.account === 'on' });
-    setMessage('여행 정보와 맞춤 금융 가이드를 업데이트했어요. 기존 거래는 기록 당시 환율과 통화를 유지해요.');
+    setMessage('여행 정보를 저장했어요. 기존 거래는 기록 당시 환율과 통화를 유지해요.');
   }
 
   return <>
@@ -132,53 +125,47 @@ export default function TripPage({ trip, hidden, updateTrip, navigate }) {
         <h2>좋은 여행의 시작, 꼼꼼한 준비<span>01</span></h2>
         <small>입력한 정보가 모든 화면에 연결돼요</small>
       </div>
-      <div className="setup-grid">
-        <form className="card" id="setup" onSubmit={submitTrip}>
-          <div className="card-head">
-            <div>
-              <h3>나의 여행 정보</h3>
-              <p>어디로, 어떤 여행을 떠나시나요?</p>
+      <form className="card" id="setup" onSubmit={submitTrip}>
+        <div className="card-head">
+          <div>
+            <h3>나의 여행 정보</h3>
+            <p>어디로, 어떤 여행을 떠나시나요?</p>
+          </div>
+          <span className="square-icon">✈</span>
+        </div>
+        <div className="setup-columns">
+          <div className="setup-trip">
+            <div className="two">
+              <label>
+                여행 국가
+                <select id="country" name="country" value={draftCountry} onChange={event => { setDraftCountry(event.target.value); setCity(countries[event.target.value].city); }}>
+                  <option value="JP">🇯🇵 일본</option>
+                  <option value="FR">🇫🇷 프랑스</option>
+                  <option value="TH">🇹🇭 태국</option>
+                </select>
+              </label>
+              <label>
+                도시
+                <input id="city" maxLength="40" required name="city" lang="ko" placeholder="예: 파리, 도쿄, 방콕" aria-describedby="setup-msg" value={city} onChange={event => setCity(event.target.value)} />
+              </label>
             </div>
-            <span className="square-icon">✈</span>
-          </div>
-          <div className="two">
-            <label>
-              여행 국가
-              <select id="country" name="country" value={draftCountry} onChange={event => { setDraftCountry(event.target.value); setCity(countries[event.target.value].city); }}>
-                <option value="JP">🇯🇵 일본</option>
-                <option value="FR">🇫🇷 프랑스</option>
-                <option value="TH">🇹🇭 태국</option>
-              </select>
-            </label>
-            <label>
-              도시
-              <input id="city" maxLength="40" required name="city" lang="ko" placeholder="예: 파리, 도쿄, 방콕" aria-describedby="setup-msg" value={city} onChange={event => setCity(event.target.value)} />
-            </label>
-          </div>
-          <div className="two">
-            <label>
-              출발일
-              <input id="depart" type="date" required name="depart" defaultValue={trip.depart} onInput={event => event.currentTarget.form.elements.namedItem('return').setCustomValidity('')} />
-            </label>
-            <label>
-              귀국일
-              <input id="return" type="date" required name="return" defaultValue={trip.return} onInput={event => event.currentTarget.form.elements.namedItem('return').setCustomValidity('')} />
-            </label>
-          </div>
-          <label>
-            여행 예산 
-            <span className="label-unit">KRW</span>
-            <div className="input-unit">
-              <input id="trip-budget" type="number" min="1" max="1000000000" step="1" required name="trip-budget" defaultValue={trip.budget} />
-              <span>원</span>
+            <div className="two">
+              <label>
+                출발일
+                <input id="depart" type="date" required name="depart" defaultValue={trip.depart} onInput={event => event.currentTarget.form.elements.namedItem('return').setCustomValidity('')} />
+              </label>
+              <label>
+                귀국일
+                <input id="return" type="date" required name="return" defaultValue={trip.return} onInput={event => event.currentTarget.form.elements.namedItem('return').setCustomValidity('')} />
+              </label>
             </div>
-          </label>
-          <div className="two">
             <label>
-              보유 카드
-              <select id="card" name="card" value={category} onChange={event => changeCategory(event.target.value)}>
-                {Object.entries(cardCategories).map(([value, label]) => <option value={value} key={value}>{label}</option>)}
-              </select>
+              여행 예산 
+              <span className="label-unit">KRW</span>
+              <div className="input-unit">
+                <input id="trip-budget" type="number" min="1" max="1000000000" step="1" required name="trip-budget" defaultValue={trip.budget} />
+                <span>원</span>
+              </div>
             </label>
             <label>
               보유 현금
@@ -186,75 +173,58 @@ export default function TripPage({ trip, hidden, updateTrip, navigate }) {
               <input id="trip-cash" type="number" min="0" max="1000000000" step="0.01" required name="trip-cash" defaultValue={trip.cash} />
             </label>
           </div>
-          {category === 'none'
-            ? cards.length > 0 && <p className="card-hint">저장하면 추가한 카드가 모두 지워져요.</p>
-            : <>
-              <div className={category === 'standard' ? 'two' : undefined}>
-                {category === 'standard' && <label>
-                  카드사
-                  <select id="card-issuer" value={issuer} onChange={event => changeIssuer(event.target.value)}>
-                    {issuersFor('standard').map(name => <option value={name} key={name}>{name}</option>)}
-                    <option value="other">기타 카드사</option>
-                  </select>
+          <div className="setup-cards">
+            <label>
+              보유 카드
+              <select id="card" name="card" value={category} onChange={event => changeCategory(event.target.value)}>
+                {Object.entries(cardCategories).map(([value, label]) => <option value={value} key={value}>{label}</option>)}
+              </select>
+            </label>
+            {category === 'none'
+              ? cards.length > 0 && <p className="card-hint">저장하면 추가한 카드가 모두 지워져요.</p>
+              : <>
+                <div className={category === 'standard' ? 'two' : undefined}>
+                  {category === 'standard' && <label>
+                    카드사
+                    <select id="card-issuer" value={issuer} onChange={event => changeIssuer(event.target.value)}>
+                      {issuersFor('standard').map(name => <option value={name} key={name}>{name}</option>)}
+                      <option value="other">기타 카드사</option>
+                    </select>
+                  </label>}
+                  <label>
+                    카드
+                    <select id="card-id" value={pickId} onChange={event => setPickId(event.target.value)}>
+                      {cardsFor(category, pickIssuer).map(card => <option value={card.id} key={card.id}>{card.name}</option>)}
+                      <option value="custom">기타(직접 입력)</option>
+                    </select>
+                  </label>
+                </div>
+                {pickId === 'custom' && <label>
+                  카드명
+                  <input id="card-name" maxLength="40" placeholder="예: 내 해외결제 카드" value={customName} onChange={event => setCustomName(event.target.value)} />
                 </label>}
-                <label>
-                  카드
-                  <select id="card-id" value={pickId} onChange={event => setPickId(event.target.value)}>
-                    {cardsFor(category, pickIssuer).map(card => <option value={card.id} key={card.id}>{card.name}</option>)}
-                    <option value="custom">기타(직접 입력)</option>
-                  </select>
-                </label>
-              </div>
-              {pickId === 'custom' && <label>
-                카드명
-                <input id="card-name" maxLength="40" placeholder="예: 내 해외결제 카드" value={customName} onChange={event => setCustomName(event.target.value)} />
-              </label>}
-              <div className="card-add">
-                <button type="button" className="secondary" onClick={addCard}>+ 카드 추가</button>
-                <span>{cards.length ? '여러 장을 추가할 수 있어요.' : '추가하지 않으면 지금 선택한 카드로 저장돼요.'}</span>
-              </div>
-              {cards.length > 0 && <ul className="card-chips" aria-label="추가한 카드">
-                {cards.map(card => <li key={card.id + card.issuer + card.name}>
-                  {card.name || '카드 미지정'}
-                  <button type="button" aria-label={(card.name || '카드 미지정') + ' 삭제'} onClick={() => setCards(cards.filter(item => !sameCard(item, card)))}>×</button>
-                </li>)}
-              </ul>}
-            </>}
-          <label className="check-row">
-            <input id="account" type="checkbox" name="account" defaultChecked={trip.account} />
-            <span>해외결제용 외화계좌·충전 서비스를 보유하고 있어요</span>
-          </label>
-          <button className="primary">맞춤 금융 가이드 업데이트 <span>→</span></button>
-          <p id="setup-msg" className="form-message" role="status">{message}</p>
-        </form>
-        <div className="guide-stack">
-          <div className="guide-card">
-            <div className="eyebrow">
-              YOUR MONEY, READY TO GO
-            </div>
-            <h3>지금 챙기면,<br />여행이 더 가벼워져요.</h3>
-            <div id="personal-guide">
-              {guides.map(([icon, title, body]) => <div className="guide-item" key={title}>
-                <span>{icon}</span><div><b>{title}</b><p>{body}</p></div>
-              </div>)}
-            </div>
-            <div className="dcc-note">
-              <span>TIP</span>
-              <p>해외원화결제(DCC)는 원화 환산 비용이 더해질 수 있어요. 결제 화면에서 <b>현지통화</b>와 적용 조건을 확인하세요.</p>
-            </div>
-          </div>
-          <div className="account-note">
-            <span className="woori-dot">W</span>
-            <div>
-              <b>외화 충전도 함께 비교해요</b>
-              <p>우리금융 서비스의 지원 통화와 한도를 확인하고<br />현지 ATM·환전소와 비용을 비교해 보세요.</p>
-            </div>
-            <button data-go="atm" aria-label="외화 충전 비용 비교" onClick={() => navigate('atm')}>↗</button>
+                <div className="card-add">
+                  <button type="button" className="secondary" onClick={addCard}>+ 카드 추가</button>
+                  <span>{cards.length ? '여러 장을 추가할 수 있어요.' : '추가하지 않으면 지금 선택한 카드로 저장돼요.'}</span>
+                </div>
+                {cards.length > 0 && <ul className="card-chips" aria-label="추가한 카드">
+                  {cards.map(card => <li key={card.id + card.issuer + card.name}>
+                    {card.name || '카드 미지정'}
+                    <button type="button" aria-label={(card.name || '카드 미지정') + ' 삭제'} onClick={() => setCards(cards.filter(item => !sameCard(item, card)))}>×</button>
+                  </li>)}
+                </ul>}
+              </>}
+            <label className="check-row">
+              <input id="account" type="checkbox" name="account" defaultChecked={trip.account} />
+              <span>해외결제용 외화계좌·충전 서비스를 보유하고 있어요</span>
+            </label>
           </div>
         </div>
-      </div>
+        <button className="primary">여행 정보 저장 <span>→</span></button>
+        <p id="setup-msg" className="form-message" role="status">{message}</p>
+      </form>
       <div className="section-title">
-        <h2>내 카드, 어떤 조건을 확인할까요?</h2>
+        <h2>내 카드, 어떤 혜택을 가지고 있나요?</h2>
         <span className="muted-tag">카드고릴라 기준 · {CHECKED_AT} 확인</span>
       </div>
       <div className="card fee-card">
@@ -268,27 +238,34 @@ export default function TripPage({ trip, hidden, updateTrip, navigate }) {
                 <th>
                   혜택
                 </th>
+                <th>
+                  조건
+                </th>
               </tr>
             </thead>
             <tbody id="card-benefits">
-              {trip.cards.map(card => {
+              {trip.cards.flatMap(card => {
                 const preset = findPreset(card.id);
                 const benefits = cardBenefits(card);
-                return <tr key={card.id + card.issuer + card.name}>
-                  <td>
-                    <b>{card.name || '카드 미지정'}</b>
-                    <small>{preset ? `${preset.issuer} · ${preset.kind} · ${preset.brands.join('/')}` : `${cardCategories[card.category]}${card.issuer ? ' · ' + card.issuer : ''} · 직접 입력`}</small>
-                  </td>
-                  <td>
-                    {benefits.length
-                      ? <div className="benefit-list">{benefits.map(benefit => <span key={benefit}>{benefit}</span>)}</div>
-                      : <span className="badge neutral">확인 필요</span>}
-                  </td>
-                </tr>;
+                const key = card.id + card.issuer + card.name;
+                const method = <td rowSpan={benefits.length || 1}>
+                  <b>{card.name || '카드 미지정'}</b>
+                  <small>{preset ? `${preset.issuer} · ${preset.kind} · ${preset.brands.join('/')}` : `${cardCategories[card.category]}${card.issuer ? ' · ' + card.issuer : ''} · 직접 입력`}</small>
+                </td>;
+                if (!benefits.length) return [<tr key={key}>{method}<td colSpan="2"><span className="badge neutral">확인 필요</span></td></tr>];
+                return benefits.map((benefit, index) => <tr key={key + index} className={index < benefits.length - 1 ? 'benefit-cont' : undefined}>
+                  {index === 0 && method}
+                  <td className="benefit-text">{benefit.text}</td>
+                  <td className="benefit-cond">{benefit.condition === '확인 필요' ? <span className="badge neutral">확인 필요</span> : benefit.condition}</td>
+                </tr>);
               })}
             </tbody>
           </table>
         </div> : <p className="fee-empty">보유 카드가 없어요. 해외에서 쓸 카드를 준비하고, 우리금융 공식 채널에서 해외결제·외화 충전 상품을 확인해 보세요.</p>}
+        <div className="dcc-note">
+          <span>TIP</span>
+          <p>해외원화결제(DCC)는 원화 환산 비용이 더해질 수 있어요. 결제 화면에서 <b>현지통화</b>와 적용 조건을 확인하세요.</p>
+        </div>
         <div className="official-links">
           <span>우리금융 공식 채널에서 실제 조건 확인</span>
           <a href="https://www.wooricard.com/" target="_blank" rel="noopener noreferrer">우리카드 ↗</a>
