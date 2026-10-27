@@ -34,7 +34,27 @@ try {
   await evaluate('Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,2000))])');
   await check(`document.title.includes("여행WON해")`,'title');
   await check(`document.querySelectorAll(".page:not([hidden])").length===1`,'one page visible');
+  await check(`document.getElementById('country')?.value==='JP' && document.getElementById('hero-city')?.textContent==='도쿄.'`,'new visitor defaults to Japan');
+  const preserved=await evaluate(`({expenses:JSON.stringify(state.expenses),receipts:JSON.stringify(state.receipts),budget:state.trip.budget})`);
+  await evaluate(`(()=>{delete state.defaultCountryVersion;state.trip.country='FR';state.trip.city='파리';state.board={country:'FR',rate:1600,fee:200};localStorage.setItem('travelback-finance-v2',JSON.stringify(state));return true;})()`);
+  await send('Page.reload');
+  await check(`state?.defaultCountryVersion===1 && state.trip.country==='JP' && document.getElementById('country')?.value==='JP' && document.getElementById('hero-city')?.textContent==='도쿄.' && state.board===null`,'saved old Paris default migrates to Japan');
+  await check(`JSON.stringify(state.expenses)===${JSON.stringify(preserved.expenses)} && JSON.stringify(state.receipts)===${JSON.stringify(preserved.receipts)} && state.trip.budget===${preserved.budget}`,'destination migration preserves financial records');
+  await set({country:'FR',city:'파리'});await submit('setup');await send('Page.reload');
+  await check(`state?.defaultCountryVersion===1 && state.trip.country==='FR' && document.getElementById('hero-city')?.textContent==='파리.'`,'later deliberate France selection survives reload');
+  await set({country:'JP',city:'도쿄'});await submit('setup');
   await shot('home');
+  for(const [country,city,korean,landmark] of [['FR','Paris','파리','에펠탑'],['JP','Tokyo','도쿄','도쿄 타워'],['TH','Bangkok','방콕','왓 아룬']]){
+    await click('[data-tab="home"]');await set({country,city});await submit('setup');
+    await check(`document.getElementById('hero-city').textContent===${JSON.stringify(korean+'.')}`,'Korean hero city '+country);
+    await check(`document.querySelector('.landmark-art')?.dataset.country===${JSON.stringify(country)} && document.querySelector('.landmark-art').getAttribute('aria-label').includes(${JSON.stringify(landmark)}) && document.querySelector('.landmark-art svg').getBoundingClientRect().width>0`,'country landmark '+country);
+    await shot('landmark-'+country);
+  }
+  await set({country:'JP',city:'Kyoto'});await submit('setup');
+  await check(`document.getElementById('setup-msg').textContent.includes('한글') && state.trip.city==='방콕'`,'unknown Latin city requires Korean input');
+  await set({city:'교토'});await submit('setup');
+  await check(`document.getElementById('hero-city').textContent==='교토.'`,'custom Korean city preserved');
+  await set({country:'FR',city:'파리'});await submit('setup');
   for(const page of ['home','atm','tax','budget']){await click(`[data-tab="${page}"]`);await check(`!document.getElementById('${page}').hidden`,'navigation '+page);await check(`document.documentElement.scrollWidth<=innerWidth`,'desktop overflow '+page);if(page!=='home')await shot(page);}
   await click('[data-tab="tax"]');await check(`document.querySelectorAll("#optimization-table tr").length===9`,'nine combinations');await check(`document.querySelectorAll(".receipt-row.selected").length===1`,'active receipt visible');
   await click('#link-receipt');await check(`state.expenses.length===6`,'receipt linked');await click('#link-receipt');await check(`state.expenses.length===6`,'receipt link dedup');

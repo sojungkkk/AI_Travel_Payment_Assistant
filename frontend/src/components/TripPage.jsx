@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import { countries, methodNames } from '../utils/core.js';
 import { formValues, won } from '../utils/format.js';
+import { isKoreanCity, normalizeCity } from '../utils/city.js';
+import CountryLandmark from './CountryLandmark.jsx';
 
 export default function TripPage({ trip, hidden, updateTrip, navigate }) {
   const [draftCountry, setDraftCountry] = useState(trip.country);
-  const [city, setCity] = useState(trip.city);
+  const [city, setCity] = useState(() => normalizeCity(trip.city, trip.country));
   const [message, setMessage] = useState('');
   const country = countries[trip.country];
+  const heroCity = normalizeCity(trip.city, trip.country);
   const guides = [
     ['€', country.currency + '로 결제해요', '현지통화 ' + country.code + '와 해외원화결제 조건을 비교하세요.'],
     ['▣', trip.card === 'none' ? '카드가 없다면 현금 준비부터' : '보유 카드의 해외 사용을 확인해요',
@@ -19,13 +22,19 @@ export default function TripPage({ trip, hidden, updateTrip, navigate }) {
     event.preventDefault();
     const data = formValues(event.currentTarget);
     if (!data.city.trim()) { setMessage('도시를 입력해 주세요.'); return; }
+    const koreanCity = normalizeCity(data.city, data.country);
+    if (!isKoreanCity(koreanCity)) {
+      setMessage('도시명을 한글로 입력해 주세요. 예: 파리, 도쿄, 방콕');
+      return;
+    }
     if (data.return < data.depart) {
       const input = event.currentTarget.elements.namedItem('return');
       input.setCustomValidity('귀국일은 출발일 이후로 선택해 주세요.');
       input.reportValidity();
       return;
     }
-    updateTrip({ country: data.country, city: data.city.trim(), depart: data.depart, return: data.return,
+    setCity(koreanCity);
+    updateTrip({ country: data.country, city: koreanCity, depart: data.depart, return: data.return,
       budget: Number(data['trip-budget']), cash: Number(data['trip-cash']), card: data.card, account: data.account === 'on' });
     setMessage('여행 정보와 맞춤 금융 가이드를 업데이트했어요. 기존 거래는 기록 당시 환율과 통화를 유지해요.');
   }
@@ -45,14 +54,11 @@ export default function TripPage({ trip, hidden, updateTrip, navigate }) {
       <div className="hero">
         <div className="hero-copy">
           <span className="hero-tag"><i></i> YOUR JOURNEY STARTS HERE</span>
-          <h2>당신의 다음 장은,<br /><i id="hero-city">{(trip.city === country.city ? country.hero : trip.city)}.</i></h2>
+          <h2>당신의 다음 장은,<br /><i id="hero-city">{isKoreanCity(heroCity) ? heroCity + '.' : '도시를 한글로 입력해 주세요.'}</i></h2>
           <p>작은 카페의 에스프레소부터 기다려온 쇼핑까지.<br />여행의 순간에만 집중할 수 있도록.</p>
           <a className="light-button" href="#setup">나의 여행 설정하기 <span>↗</span></a>
         </div>
-        <div className="paris-art" aria-hidden="true" style={{ visibility: trip.country === 'FR' ? 'visible' : 'hidden' }}>
-          <svg viewBox="0 0 420 310"><circle cx="232" cy="125" r="98" fill="#b9e8ff"></circle><circle cx="232" cy="125" r="117" fill="none" stroke="#ffffff20"></circle><g stroke="#81c5eb" fill="none"><path d="M0 274h420M28 250h350M18 227h385M30 274V193h55v81m-45-81v-22h34v22m260 81v-92h48v92m-37-92v-20h25v20"></path><path d="M30 204h55m-55 15h55m-55 16h55m249-39h48m-48 15h48m-48 15h48"></path></g><g fill="none" stroke="#effaff" strokeLinejoin="round"><path d="M214 40l-17 116-48 118m65-234l17 116 48 118M190 165h49m-63 40h80m-93 45h105M196 154h37M204 112h21M214 27v17" strokeWidth="5"></path><path d="M185 274q28-74 58 0M197 156l43 49m-9-49l-43 49m-12 0l77 45m3-45l-78 45" strokeWidth="2.5"></path></g><g fill="#85caef"><path d="M21 274v-34q-22-40 0-49 23 9 0 49m372 34v-34q-22-40 0-49 23 9 0 49"></path></g><path d="M79 88l8-19 8 19 19 8-19 8-8 19-8-19-19-8z" fill="#c6ebff"></path><path d="M332 64l4-10 4 10 10 4-10 4-4 10-4-10-10-4z" fill="#c6ebff"></path></svg>
-          <span>48°51′24″N  2°21′08″E</span>
-        </div>
+        <CountryLandmark countryCode={trip.country} />
         <div className="hero-ticket">
           <div>
             <span>TRAVEL CURRENCY</span>
@@ -92,14 +98,14 @@ export default function TripPage({ trip, hidden, updateTrip, navigate }) {
             <label>
               여행 국가
               <select id="country" name="country" value={draftCountry} onChange={event => { setDraftCountry(event.target.value); setCity(countries[event.target.value].city); }}>
-                <option value="FR">🇫🇷 프랑스</option>
                 <option value="JP">🇯🇵 일본</option>
+                <option value="FR">🇫🇷 프랑스</option>
                 <option value="TH">🇹🇭 태국</option>
               </select>
             </label>
             <label>
               도시
-              <input id="city" maxLength="40" required name="city" value={city} onChange={event => setCity(event.target.value)} />
+              <input id="city" maxLength="40" required name="city" lang="ko" placeholder="예: 파리, 도쿄, 방콕" aria-describedby="setup-msg" value={city} onChange={event => setCity(event.target.value)} />
             </label>
           </div>
           <div className="two">
