@@ -8,7 +8,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --test ../tests/core.test.cjs",
+    "test": "node --test ../tests/core.test.cjs ../tests/cards.test.cjs",
     "test:browser": "npm run build && node ../scripts/browser-check.mjs"
   },
   "dependencies": {
