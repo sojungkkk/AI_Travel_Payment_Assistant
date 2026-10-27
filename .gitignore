@@ -8,6 +8,10 @@
 # macOS 메타데이터
 .DS_Store
 
+# 백엔드(Gradle) 빌드 결과
+/.gradle/
+/build/
+
 # 프런트엔드 의존성과 빌드 결과
 /frontend/node_modules/
 /frontend/dist/
