@@ -12,3 +12,9 @@
 /frontend/node_modules/
 /frontend/dist/
 /frontend/.env.*
+# Gradle 빌드 결과
+.gradle/
+build/
+
+# IDE(VS Code Java) 빌드 결과
+bin/
