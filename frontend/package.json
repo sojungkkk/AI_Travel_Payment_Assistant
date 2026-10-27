@@ -1,0 +1,22 @@
+{
+  "name": "travel-wonhae-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22.12.0" },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node --test ../tests/core.test.cjs",
+    "test:browser": "npm run build && node ../scripts/browser-check.mjs"
+  },
+  "dependencies": {
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "6.1.0",
+    "vite": "8.3.5"
+  }
+}

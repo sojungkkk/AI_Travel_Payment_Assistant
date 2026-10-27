@@ -1,6 +1,6 @@
 const {test} = require('node:test');
 const assert = require('node:assert/strict');
-const T = require('../dist/core.js');
+const T = require('../frontend/src/utils/core.js');
 const group = {country:'FR',amount:420,eligible:true,docs:true,instant:true,city:false};
 const cash = {needed:150,cash:80,balance:250,rate:1580,operatorFee:3,card:'travel',account:true,supported:true,walk:15,cashKRW:300000};
 test('동일 현금 수령액으로 원금과 모든 비용을 합산한다',()=>{
