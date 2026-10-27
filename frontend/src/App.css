@@ -43,3 +43,50 @@ nav button.active small{color:#376b94}
 /* 한글 도시명은 긴 이름도 배너 안에서 줄바꿈합니다. */
 #hero-city{font-family:inherit;font-style:normal;font-weight:700;font-size:clamp(38px,4.2vw,60px);line-height:1.3;letter-spacing:-1.5px;display:block;max-width:360px;overflow-wrap:anywhere;word-break:keep-all}
 @media(max-width:700px){#hero-city{max-width:250px}}
+/* 3페이지: 환급 진행 · BVE 등록 · 사진 인식 (R51~R53, R55) */
+#tax-form fieldset,#bve-form fieldset{border:0;padding:0;margin:0;min-width:0}
+.badge.done{background:#ccefff;color:#004f86}
+.badge.warn{background:#f8e0d2;color:#a0552f}
+.tracker-banner{background:#fff4e6;border:1px solid #f0d3b0;color:#8d5a2b;border-radius:6px;padding:11px 13px;font-size:11px;line-height:1.7;margin-bottom:12px}
+.today-row{display:flex;align-items:center;justify-content:flex-end;gap:8px;font-size:9px;letter-spacing:0;margin-bottom:10px}
+.today-row input{width:auto;padding:5px 8px;font-size:10px}
+.progress-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:8px}
+.status-badge{display:inline-block;white-space:nowrap;padding:6px 11px;border-radius:6px;font-size:12px;font-weight:600;background:#dde9f3;color:#2d5878}
+.status-badge.done{background:#ccefff;color:#004f86}
+.status-badge.warn{background:#f8e0d2;color:#a0552f}
+.status-badge.peach{background:#f8eadb;color:#a97746}
+.status-badge.neutral{background:#eaf1f7;color:#4b6f8c}
+.status-alert{background:#eef5fb;border-radius:6px;padding:11px 13px;font-size:11px;color:#1d4f78;margin:0 0 10px}
+.status-note{font-size:11px;color:#a0552f;margin:0 0 10px;line-height:1.8}
+.deadline-row{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:10px;color:#4c708e;margin:6px 0 10px}
+.deadline-row b{color:var(--ink)}
+.confirm-box{margin-top:14px;border-top:1px dashed var(--line);padding-top:14px}
+.confirm-box>b{display:block;font-size:12px;margin-bottom:12px}
+.confirm-row{display:flex;justify-content:space-between;align-items:center;margin-top:14px;font-size:11px;color:#1d4f78;background:#eef5fb;border-radius:6px;padding:10px 13px}
+.confirm-row .text-button{margin-top:0}
+#tax-form.ocr-reading :is(#store,#purchase-date,#purchase-amount,#purchase-method,#vat-number){color:transparent;cursor:progress;border-color:#d9e8f5;background:linear-gradient(90deg,#f2f7fb 25%,#ddebf6 50%,#f2f7fb 75%) 0 0/200% 100%;animation:ocr-shimmer 1.2s linear infinite}
+#tax-form.ocr-reading .check-row,#tax-form.ocr-reading .primary{opacity:.55;cursor:progress}
+.form-message.ocr-status{display:flex;align-items:center;gap:8px;font-weight:500;color:var(--primary)}
+.form-message.ocr-status:before{content:"";width:12px;height:12px;flex-shrink:0;border-radius:50%;border:2px solid var(--accent);border-top-color:var(--primary);animation:ocr-spin .8s linear infinite}
+#tax-form .ocr-filled{animation:ocr-filled 2.4s ease-out}
+@keyframes ocr-shimmer{to{background-position:-200% 0}}
+@keyframes ocr-spin{to{transform:rotate(360deg)}}
+@keyframes ocr-filled{0%,40%{background:var(--accent);border-color:#7fc4ea}100%{background:#fff;border-color:var(--line)}}
+@media(prefers-reduced-motion:reduce){#tax-form.ocr-reading :is(#store,#purchase-date,#purchase-amount,#purchase-method,#vat-number),.form-message.ocr-status:before{animation:none}}
+@media(max-width:960px){.progress-grid{grid-template-columns:1fr}}
+/* 3페이지 맨 위 환급 절차: 큰 글씨 단계 카드 (R36) */
+.route-top{margin-bottom:28px}
+.route-top-head{display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:center}
+.route-top-head h3{font-size:18px}
+.route-top-head .two label{margin-bottom:0}
+.route-guide{font-size:13px;line-height:1.8;color:#2d4a63;background:#f2f7fb;border-radius:8px;padding:14px 16px;margin:18px 0 20px}
+.route-flow{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.route-flow-step{background:#f8fbfd;border:1px solid var(--line);border-radius:12px;padding:20px}
+.route-flow-step.key{background:#eef6fc;border:2px solid var(--primary)}
+.route-flow-step .num{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--primary);color:#fff;font-weight:700;font-size:15px;margin-bottom:12px}
+.route-flow-step h4{font-size:17px;margin:0 0 12px;color:var(--ink)}
+.route-flow-step ul,.route-flow-step ol{margin:0;padding-left:20px}
+.route-flow-step li{font-size:14px;line-height:1.7;color:#2d4a63;margin-bottom:8px}
+.route-flow-step li:last-child{margin-bottom:0}
+.route-grid.single{grid-template-columns:1fr}
+@media(max-width:960px){.route-top-head,.route-flow{grid-template-columns:1fr}}

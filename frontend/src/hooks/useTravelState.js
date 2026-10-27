@@ -6,7 +6,7 @@ import { normalizeCards, primaryCategory } from '../utils/cards.js';
 
 const DEFAULT_COUNTRY_VERSION = 1;
 
-const defaults = () => ({ version:2, defaultCountryVersion:DEFAULT_COUNTRY_VERSION, trip:{country:'JP',city:'도쿄',depart:'2026-11-10',return:'2026-11-17',budget:3000000,cash:80,card:'travel',cards:[{id:'2394',category:'travel',issuer:'하나카드',name:'트래블로그 체크카드'}],account:true}, receipts:[{id:'demo-receipt',store:'파리 백화점 · 예시',date:'2026-11-12',amount:420,eligible:true,docs:true,instant:true,city:false,method:'travel',country:'FR'}], expenses:[['파리의 작은 비스트로',48,'음식'],['공항에서 숙소까지',25,'교통'],['마레 지구 기념품',85,'쇼핑'],['센 강 근처의 숙소',240,'숙박'],['미술관 관람',22,'관광']].map(([name,amount,category],i)=>({id:'demo-expense-'+i,name,amount,category,date:'2026-11-11',country:'FR',method:i===0?'cash':'travel',type:'purchase',rate:1580,cost:T.paymentCost(amount,i===0?'cash':'travel',1580),fee:T.paymentCost(amount,i===0?'cash':'travel',1580)-Math.round(amount*1580),expectedRefund:0,actualRefund:null})), selected:'demo-receipt', choices:{}, board:null, exitAirport:'파리 샤를드골 (CDG)', exitCountry:'FR' });
+const defaults = () => ({ version:2, defaultCountryVersion:DEFAULT_COUNTRY_VERSION, trip:{country:'JP',city:'도쿄',depart:'2026-11-10',return:'2026-11-17',budget:3000000,cash:80,card:'travel',cards:[{id:'2394',category:'travel',issuer:'하나카드',name:'트래블로그 체크카드'}],account:true}, receipts:[{id:'demo-receipt',store:'파리 백화점 · 예시',date:'2026-11-12',amount:420,eligible:true,docs:true,instant:true,city:false,method:'travel',country:'FR'}], expenses:[['파리의 작은 비스트로',48,'음식'],['공항에서 숙소까지',25,'교통'],['마레 지구 기념품',85,'쇼핑'],['센 강 근처의 숙소',240,'숙박'],['미술관 관람',22,'관광']].map(([name,amount,category],i)=>({id:'demo-expense-'+i,name,amount,category,date:'2026-11-11',country:'FR',method:i===0?'cash':'travel',type:'purchase',rate:1580,cost:T.paymentCost(amount,i===0?'cash':'travel',1580),fee:T.paymentCost(amount,i===0?'cash':'travel',1580)-Math.round(amount*1580),expectedRefund:0,actualRefund:null})), selected:'demo-receipt', choices:{}, bves:{}, confirmations:{}, taxToday:null, board:null, exitAirport:'파리 샤를드골 (CDG)', exitCountry:'FR' });
 
 function migrateDefaultCountry(state, previousVersion = 0) {
   const wasOldParisDefault = previousVersion < DEFAULT_COUNTRY_VERSION
@@ -29,7 +29,7 @@ function loadSavedState() {
     const saved = JSON.parse(localStorage.getItem('travelback-finance-v2'));
     if (saved?.version === 2 && Array.isArray(saved.expenses) && Array.isArray(saved.receipts) && T.countries[saved.trip?.country]) {
       const cards = normalizeCards(saved.trip);
-      state = {...defaults(),...saved,trip:{...defaults().trip,...saved.trip,cards,card:primaryCategory(cards)}, choices:saved.choices || {}};
+      state = {...defaults(),...saved,trip:{...defaults().trip,...saved.trip,cards,card:primaryCategory(cards)}, choices:saved.choices || {}, bves:saved.bves || {}, confirmations:saved.confirmations || {}};
       state.expenses = saved.expenses.filter(e=>T.valid(e.amount)&&T.valid(e.cost)&&T.countries[e.country]&&typeof e.name==='string');
       state.receipts = saved.receipts.filter(r=>T.valid(r.amount)&&r.amount>0&&typeof r.store==='string'&&typeof r.date==='string');
       return { data: migrateDefaultCountry(state, saved.defaultCountryVersion), warning: false };
