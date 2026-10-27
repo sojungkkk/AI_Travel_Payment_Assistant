@@ -22,6 +22,9 @@
 
 ## 기술
 - Java 21 이상, Spring Boot, Gradle, JUnit 5. 정확한 버전은 SPEC.md 2장에 근거와 함께 적습니다.
+- 코드 작성 전 [WONIT-A/05_springAI](https://github.com/WONIT-A/05_springAI.git)의 README.md, build.gradle, frontend/package.json과 관련 소스를 확인하고, 해당 저장소의 기술 스택과 프로젝트 구조를 참고합니다.
+- 백엔드(Java 21, Spring Boot, Spring AI, Spring Data JPA, Gradle)와 프런트엔드(React, Vite)의 구성, 계층별 책임, API 연동 및 테스트 방식을 참고하되, 승인된 SPEC.md와 현재 MVP 핵심 기능에 필요한 부분만 적용합니다.
+- 참고 저장소에 접근하지 못하면 확인하지 못한 내용을 추측하지 않고 알립니다.
 - 테스트 명령: ./gradlew test (Windows: .\gradlew.bat test)
 
 ## 일하는 순서
